@@ -1,0 +1,22 @@
+{
+  "name": "loader",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "relaxgo <patientzhe@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "jest --watch",
+    "test": "jest"
+  },
+  "dependencies": {
+    "eventemitter3": "^3.1.0",
+    "koa-compose": "^4.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/preset-env": "^7.3.1",
+    "babel-jest": "^24.0.0",
+    "jest": "^24.0.0"
+  }
+}
