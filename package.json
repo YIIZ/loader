@@ -1,5 +1,5 @@
 {
-  "name": "loader",
+  "name": "@teambun/loader",
   "version": "0.0.1",
   "main": "index.js",
   "author": "relaxgo <patientzhe@gmail.com>",
