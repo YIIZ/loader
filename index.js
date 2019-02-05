@@ -7,6 +7,7 @@ const { RESOURCE_STATE, RESOURCE_TYPE } = Resource
 class Loader extends Resource {
   constructor() {
     super({ type: 'LOADER' })
+    this.groups = {}
     this.resources = {}
     this.queue = []
     this.middlewares =[]
@@ -21,21 +22,33 @@ class Loader extends Resource {
     this.handle = compose(this.middlewares)
   }
 
+  _normalize(params) {
+    let res = params instanceof Resource ? params : new Resource(params)
+    res = this.resources[res.name] || res
+    this.resources[res.name] = res
+    return res
+  }
+
   add(params) {
     if (this.progressing) {
       throw new Error('add resource when progressing')
     }
-    const res = params instanceof Resource ? params : new Resource(params)
-    if (this.resources[res.name]) return this.resources[res.name]
-
-    this.resources[res.name] = res
+    const res = this._normalize(params)
+    if (this.queue.indexOf(res) > -1) return res
     this.queue.push(res)
     return res
   }
 
+  run() {
+    const { resources, queue } = this
+    queue.forEach(res => {
+      if (res.complete) return
+      this.load(res)
+    })
+  }
+
   load(params) {
-    let res = params instanceof Resource ? params : new Resource(params)
-    if (this.resources[res.name]) res = this.resources[res.name]
+    const res = this._normalize(params)
     if (res.progressing) return res
 
     res.state = RESOURCE_STATE.LOADING
@@ -44,23 +57,40 @@ class Loader extends Resource {
     return res
   }
 
-  loadAll() {
-    const { resources, queue } = this
-    queue.forEach(res => {
-      if (res.complete) return
-      this.load(res)
+  group(name) {
+    if (this.groups[name]) return this.groups[name]
+    const g = new Group(name, this)
+    this.groups[name] = g
+    return g
+  }
+}
+
+class Group extends Resource {
+  constructor(name, loader) {
+    super({ type: 'GROUP' })
+    this.queue = []
+    this.name = name
+    this.loader = loader
+  }
+
+  get resources() {
+    return this.loader.resources
+  }
+
+  add(params) {
+    const res = this.loader._normalize(params)
+    if (this.queue.indexOf(res) > -1) return res
+    this.queue.push(res)
+    return res
+  }
+
+  run() {
+    const { queue, loader } = this
+    Promise.all(queue.map(res => loader.load(res).promise))
+    .then(() => {
+      this.emit('complete')
+      this.resolve()
     })
-  }
-
-  get(key) {
-
-  }
-
-  clone() {
-    const m = new Loader()
-    m.timeout = this.timeout
-    m.use(...this.middlewares)
-    return m
   }
 }
 
