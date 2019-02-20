@@ -9,17 +9,18 @@ class Loader extends Resource {
     super({ type: 'LOADER' })
     this.groups = {}
     this.resources = {}
-    this.queue = []
-    this.middlewares =[]
     this.timeout = 3000
+    this._middlewares =[]
+    this._queue = []
+    this._links = {}
   }
 
   use(...fn) {
     if (this.progressing) {
       throw new Error('add middleware when progressing')
     }
-    this.middlewares.push(...fn)
-    this.handle = compose(this.middlewares)
+    this._middlewares.push(...fn)
+    this.handle = compose(this._middlewares)
   }
 
   _normalize(params) {
@@ -29,21 +30,54 @@ class Loader extends Resource {
     return res
   }
 
+  _link(res) {
+    this._links[res.name] = this._links[res.name] || 0
+    this._links[res.name]++
+  }
+
+  _unlink(res) {
+    this._links[res.name]--
+  }
+
   add(params) {
     if (this.progressing) {
       throw new Error('add resource when progressing')
     }
     const res = this._normalize(params)
-    if (this.queue.indexOf(res) > -1) return res
-    this.queue.push(res)
+    if (this._queue.indexOf(res) > -1) return res
+    res.on('update', this.emitUpdate, this)
+    res.on('complete', this.emitUpdate, this)
+    this._queue.push(res)
+    return res
+  }
+
+  emitUpdate() {
+    const all = this._queue.reduce((s, v) => s + v.chunk, 0)
+    const complete = this._queue.reduce((s, v) => s + v.completeChunk, 0)
+    this.emit('update', { progress: complete / all * 100 })
+  }
+
+  remove(params) {
+    if (this.progressing) {
+      throw new Error('remove resource when progressing')
+    }
+    const res = this._normalize(params)
+    if (this._links[res.name] > 0) {
+      console.error(res.name, 'has link')
+    }
+    delete this.resources[res.name]
+    delete this._links[res.name]
+    const index = this._queue.indexOf(res)
+    if (index > -1) this._queue.splice(index, 1)
     return res
   }
 
   run() {
-    const { resources, queue } = this
-    queue.forEach(res => {
-      if (res.complete) return
-      this.load(res)
+    const { resources, _queue } = this
+    Promise.all(_queue.map(res => loader.load(res).promise))
+    .then(() => {
+      this.resolve()
+      this._queue.length = 0
     })
   }
 
@@ -68,9 +102,9 @@ class Loader extends Resource {
 class Group extends Resource {
   constructor(name, loader) {
     super({ type: 'GROUP' })
-    this.queue = []
     this.name = name
     this.loader = loader
+    this._queue = []
   }
 
   get resources() {
@@ -78,21 +112,39 @@ class Group extends Resource {
   }
 
   add(params) {
-    const res = this.loader._normalize(params)
-    if (this.queue.indexOf(res) > -1) return res
-    this.queue.push(res)
+    const { loader, _queue } = this
+    const res = loader._normalize(params)
+    if (_queue.indexOf(res) > -1) return res
+    loader._link(res)
+    _queue.push(res)
     return res
   }
 
   run() {
-    const { queue, loader } = this
-    Promise.all(queue.map(res => loader.load(res).promise))
+    const { _queue, loader } = this
+    Promise.all(_queue.map(res => loader.load(res).promise))
     .then(() => {
-      this.emit('complete')
       this.resolve()
+      this._queue.length = 0
+    })
+  }
+
+  unique() {
+    const { loader, _queue } = this
+    return _queue.filter((res) => loader._links[res.name] === 1)
+  }
+
+  destory() {
+    const { loader, _queue } = this
+    _queue.forEach((res) => {
+      loader._unlink(res)
+      if (loader._links[res] > 0) return
+      loader.remove(res)
     })
   }
 }
+
+// TODO children resource
 
 const loader = new Loader()
 

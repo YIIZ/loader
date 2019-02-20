@@ -5,6 +5,7 @@ const RESOURCE_TYPE = {
   TEXT: 'TEXT',
   JSON: 'JSON',
   SPRITESHEET: 'SPRITESHEET',
+  SPINE: 'SPINE',
   UNKNOWN: 'UNKNOWN',
 }
 const RESOURCE_STATE = {
@@ -20,6 +21,7 @@ class Resource extends EventEmitter {
     super()
 
     this.chunk = 1
+    this.completeChunk = 0
     this.state = RESOURCE_STATE.INIT
 
     const params = typeof arg === 'string' ? { url: arg } : arg
@@ -29,6 +31,7 @@ class Resource extends EventEmitter {
 
     this.promise = new Promise((resolve, reject) => {
       this.resolve = () => {
+        this.completeChunk = this.chunk
         this.state = RESOURCE_STATE.COMPLETE
         this.emit('complete')
         resolve(this)
@@ -54,7 +57,8 @@ function determineResourceType(params) {
   const { url } = params
   if (url.match(/\.json$/)) return RESOURCE_TYPE.JSON
   if (url.match(/\.png|\.jpg|\.jpeg|\.svg/)) return RESOURCE_TYPE.IMAGE
-  if (url.match(/\.altas/)) return RESOURCE_TYPE.TEXT
+  if (url.match(/^data:image/)) return RESOURCE_TYPE.IMAGE
+  if (url.match(/\.atlas/)) return RESOURCE_TYPE.TEXT
   return RESOURCE_TYPE.UNKNOWN
 }
 
