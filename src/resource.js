@@ -1,4 +1,4 @@
-const EventEmitter = require('eventemitter3')
+import EventEmitter from 'eventemitter3'
 
 const RESOURCE_TYPE = {
   IMAGE: 'IMAGE',
@@ -66,4 +66,9 @@ Resource.determineResourceType = determineResourceType
 Resource.RESOURCE_STATE = RESOURCE_STATE
 Resource.RESOURCE_TYPE = RESOURCE_TYPE
 
-module.exports = Resource
+export {
+  RESOURCE_STATE,
+  RESOURCE_TYPE,
+}
+
+export default Resource

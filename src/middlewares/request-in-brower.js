@@ -1,4 +1,4 @@
-const { RESOURCE_TYPE, RESOURCE_STATE }  = require('../resource.js')
+import { RESOURCE_TYPE, RESOURCE_STATE }  from '../resource.js'
 
 const requestByImageElement = (ctx, next) => {
   const { res } = ctx
@@ -124,4 +124,4 @@ const request = (ctx, next) => {
   }
 }
 
-module.exports = request
+export default request

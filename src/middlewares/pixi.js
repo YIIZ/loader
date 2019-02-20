@@ -1,5 +1,5 @@
-const { RESOURCE_TYPE }  = require('../resource.js')
-const PIXI = require('pixi.js')
+import { RESOURCE_TYPE }  from '../resource.js'
+import * as PIXI from 'pixi.js'
 
 const textureParser = (ctx, next) => {
   const { res } = ctx
@@ -21,8 +21,6 @@ async function spritesheetParser(ctx, next) {
   res.spritesheet.parse(next)
 }
 
-exports.textureParser = textureParser
-exports.spritesheetParser = spritesheetParser
 async function spineParser(ctx, next) {
   const { res, loader } = ctx
   if (res.type !== RESOURCE_TYPE.SPINE) return next()
@@ -44,4 +42,10 @@ async function spineParser(ctx, next) {
     res.spineAtlas = spineAtlas
     next()
   })
+}
+
+export {
+  textureParser,
+  spritesheetParser,
+  spineParser,
 }

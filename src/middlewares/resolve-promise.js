@@ -3,4 +3,4 @@ const resolvePromise = (ctx, next) => {
   res.resolve()
 }
 
-module.exports = resolvePromise
+export default resolvePromise

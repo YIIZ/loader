@@ -15,4 +15,4 @@ const concurrentLimit = (limit = 10) => {
   }
 }
 
-module.exports = concurrentLimit
+export default concurrentLimit

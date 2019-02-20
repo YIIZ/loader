@@ -1,4 +1,4 @@
-const { RESOURCE_TYPE } = require('../resource.js')
+import { RESOURCE_TYPE } from '../resource.js'
 
 const jsonParser = (ctx, next) => {
   const { res } = ctx
@@ -7,4 +7,4 @@ const jsonParser = (ctx, next) => {
   next()
 }
 
-module.exports = jsonParser
+export default jsonParser

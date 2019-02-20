@@ -1,6 +1,6 @@
-const EventEmitter = require('eventemitter3')
-const compose = require( 'koa-compose')
-const Resource = require( './resource.js')
+import EventEmitter from 'eventemitter3'
+import compose from 'koa-compose'
+import Resource from './resource.js'
 
 const { RESOURCE_STATE, RESOURCE_TYPE } = Resource
 
@@ -148,5 +148,7 @@ class Group extends Resource {
 
 const loader = new Loader()
 
-module.exports = loader
-module.exports.Loader = Loader
+export default loader
+export {
+  Loader
+}
