@@ -16,7 +16,8 @@ async function spritesheetParser(ctx, next) {
   if (res.type !== RESOURCE_TYPE.SPRITESHEET) return next()
 
   const config = await loader.load(res.url).promise
-  const image = await loader.load(config.data.meta.image).promise
+  const imgPath = res.image || config.data.meta.image
+  const image = await loader.load(imgPath).promise
   res.spritesheet = new PIXI.Spritesheet(image.texture.baseTexture, config.data)
   res.spritesheet.parse(next)
 }
