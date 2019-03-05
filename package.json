@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "babel --watch src -d lib",
+    "build": "babel src -d lib",
     "test": "jest"
   },
   "dependencies": {

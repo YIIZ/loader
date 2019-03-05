@@ -26,15 +26,18 @@ async function spineParser(ctx, next) {
   if (res.type !== RESOURCE_TYPE.SPINE) return next()
 
   const spine = PIXI.spine.core
+  const { url, atlas, images = {} } = res
 
   async function textureLoader(path, callback) {
-    const item = await loader.load(path).promise
+    const img = images[path] || path
+    const item = await loader.load(img).promise
     callback(item.texture.baseTexture)
   }
 
-  const config = await loader.load({ name: `json:${res.url}`, url: res.url }).promise
-  const atlas = await loader.load(res.url.replace(/\.json$/, '.atlas')).promise
-  new spine.TextureAtlas(atlas.source, textureLoader, (spineAtlas) => {
+  const config = await loader.load({ name: `json:${url}`, url: url }).promise
+  const atlasPath = atlas || url.replace(/\.json$/, '.atlas')
+  const atlasRes = await loader.load(atlasPath).promise
+  new spine.TextureAtlas(atlasRes.source, textureLoader, (spineAtlas) => {
     const attachmentLoader = new spine.AtlasAttachmentLoader(spineAtlas)
     const json = new spine.SkeletonJson(attachmentLoader)
     const skeletonData = json.readSkeletonData(config.data)
