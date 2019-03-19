@@ -84,6 +84,7 @@ class Loader extends Resource {
   load(params) {
     const res = this._normalize(params)
     if (res.progressing) return res
+    if (res.complete) return res
 
     res.state = RESOURCE_STATE.LOADING
     this.resources[res.name] = res
