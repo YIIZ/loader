@@ -26,6 +26,7 @@ const requestByImageElement = (ctx, next) => {
   }
   const onProgress = () => {
     res.emit('update')
+    res.emit('progress')
   }
   const clearListener = () => {
     elem.removeEventListener('error', onError, false)
@@ -87,6 +88,7 @@ const requestByXHR = (ctx, next) => {
   }
   const onProgress = (evt) => {
     res.emit('update', evt)
+    res.emit('progress')
   }
   const onLoad = (evt) => {
     res.state = RESOURCE_STATE.LOADED

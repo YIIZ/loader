@@ -55,6 +55,7 @@ class Loader extends Resource {
     const all = this._queue.reduce((s, v) => s + v.chunk, 0)
     const complete = this._queue.reduce((s, v) => s + v.completeChunk, 0)
     this.emit('update', { progress: complete / all * 100 })
+    this.emit('progress', { progress: complete / all * 100 })
   }
 
   remove(params) {

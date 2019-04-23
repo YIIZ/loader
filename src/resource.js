@@ -34,12 +34,12 @@ class Resource extends EventEmitter {
       this.resolve = () => {
         this.completeChunk = this.chunk
         this.state = RESOURCE_STATE.COMPLETE
-        this.emit('complete')
+        this.emit('complete', this)
         resolve(this)
       }
       this.reject = (err) => {
         this.state = RESOURCE_STATE.ERROR
-        this.emit('reject')
+        this.emit('reject', this)
         reject(this)
       }
     })
