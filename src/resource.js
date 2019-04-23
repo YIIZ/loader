@@ -7,8 +7,10 @@ const RESOURCE_TYPE = {
   SPRITESHEET: 'SPRITESHEET',
   SPINE: 'SPINE',
   FONT: 'FONT',
+  MOCK: 'MOCK',
   UNKNOWN: 'UNKNOWN',
 }
+
 const RESOURCE_STATE = {
   ERROR: -1,
   INIT: 0,
@@ -18,7 +20,7 @@ const RESOURCE_STATE = {
 }
 
 class Resource extends EventEmitter {
-  constructor(arg) {
+  constructor(arg = {}) {
     super()
 
     this.chunk = 1
@@ -27,7 +29,6 @@ class Resource extends EventEmitter {
 
     const params = typeof arg === 'string' ? { url: arg } : arg
     Object.assign(this, params)
-    this.type = params.type || Resource.determineResourceType(params)
     this.name = params.name || params.url
 
     this.promise = new Promise((resolve, reject) => {
@@ -55,7 +56,8 @@ class Resource extends EventEmitter {
 }
 
 function determineResourceType(params) {
-  const { url } = params
+  const { url, type } = params
+  if (type) return type
   if (url.match(/\.json$/)) return RESOURCE_TYPE.JSON
   if (url.match(/\.png|\.jpg|\.jpeg|\.svg/)) return RESOURCE_TYPE.IMAGE
   if (url.match(/^data:image/)) return RESOURCE_TYPE.IMAGE
@@ -70,6 +72,7 @@ Resource.RESOURCE_TYPE = RESOURCE_TYPE
 export {
   RESOURCE_STATE,
   RESOURCE_TYPE,
+  determineResourceType,
 }
 
 export default Resource

@@ -1,21 +1,23 @@
 import { RESOURCE_TYPE, RESOURCE_STATE }  from '../resource.js'
+import { Deferred } from '../util.js'
 
 // TODO 缓存本地？
 
-const requestByImageElement = (ctx, next) => {
+const requestByImageElement = (ctx) => {
   const { res } = ctx
   const elem = new Image()
+  const deferred = new Deferred()
 
   const onError = () => {
     // TODO try again?
     res.state = RESOURCE_STATE.ERROR
     res.emit('error')
-    next()
+    deferred.resolve()
   }
 
   const onComplete = () => {
     res.state = RESOURCE_STATE.LOADED
-    next()
+    deferred.resolve()
   }
 
   elem.onload = onComplete
@@ -23,6 +25,70 @@ const requestByImageElement = (ctx, next) => {
 
   elem.src = res.url
   res.source = elem
+  return deferred.promise
+}
+
+const requestByRequest = (ctx) => {
+  const { res, loader } = ctx
+  const deferred = new Deferred()
+
+  const { url } = res
+  const responseType = determineResponseType(res)
+
+
+  const onError = (evt) => {
+    res.state = RESOURCE_STATE.ERROR
+    res.emit('error', evt)
+    res.reject()
+  }
+
+  const onLoad = (evt) => {
+    if (evt.statusCode !== 200) return onError(evt)
+
+    res.state = RESOURCE_STATE.LOADED
+    res.source = evt.data
+    deferred.resolve()
+  }
+
+  wx.request({
+    url,
+    dataType: responseType,
+    responseType,
+    success: onLoad,
+    fail: onError,
+  })
+
+  return deferred.promise
+}
+
+const requestByDownload = (ctx) => {
+  const { res, loader } = ctx
+  const deferred = new Deferred()
+
+  const { url } = res
+
+  const onError = (evt) => {
+    console.error('requestByDownload', evt)
+    res.state = RESOURCE_STATE.ERROR
+    res.emit('error', evt)
+    res.reject()
+  }
+
+  const onLoad = (evt) => {
+    if (evt.statusCode !== 200) return onError(evt)
+
+    res.state = RESOURCE_STATE.LOADED
+    res.source = evt.tempFilePath
+    deferred.resolve()
+  }
+
+  wx.downloadFile({
+    url,
+    success: onLoad,
+    fail: onError,
+  })
+
+  return deferred.promise
 }
 
 const RESPONSE_TYPE = {
@@ -41,75 +107,18 @@ const determineResponseType = (res) => {
   }
 }
 
-const requestByRequest = (ctx, next) => {
-  const { res, loader } = ctx
-
-  const { url } = res
-  const responseType = determineResponseType(res)
-
-
-  const onError = (evt) => {
-    res.state = RESOURCE_STATE.ERROR
-    res.emit('error', evt)
-    res.reject()
-  }
-
-  const onLoad = (evt) => {
-    if (evt.statusCode !== 200) return onError(evt)
-
-    res.state = RESOURCE_STATE.LOADED
-    res.source = evt.data
-    next()
-  }
-
-  wx.request({
-    url,
-    dataType: responseType,
-    responseType,
-    success: onLoad,
-    fail: onError,
-  })
-}
-
-const requestByDownload = (ctx, next) => {
-  const { res, loader } = ctx
-
-  const { url } = res
-
-  const onError = (evt) => {
-    console.error('requestByDownload', evt)
-    res.state = RESOURCE_STATE.ERROR
-    res.emit('error', evt)
-    res.reject()
-  }
-
-  const onLoad = (evt) => {
-    if (evt.statusCode !== 200) return onError(evt)
-
-    res.state = RESOURCE_STATE.LOADED
-    res.source = evt.tempFilePath
-    next()
-  }
-
-  wx.downloadFile({
-    url,
-    success: onLoad,
-    fail: onError,
-  })
-}
-
-const request = (ctx, next) => {
+const request = (ctx) => {
   const { res } = ctx
   switch (res.type) {
     case RESOURCE_TYPE.JSON:
     case RESOURCE_TYPE.TEXT:
-      return requestByRequest(ctx, next)
+      return requestByRequest(ctx)
     case RESOURCE_TYPE.IMAGE:
-      return requestByImageElement(ctx, next)
+      return requestByImageElement(ctx)
     case RESOURCE_TYPE.FONT:
-      return requestByDownload(ctx, next)
+      return requestByDownload(ctx)
     default:
-      return next()
+      return
   }
 }
 
