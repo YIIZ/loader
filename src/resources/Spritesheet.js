@@ -24,6 +24,11 @@ export default class Spritesheet extends Resource {
     const imgPath = res.image || config.data.meta.image
     const image = await loader.load(new Texture(imgPath)).promise
     this.completeChunk += 1
+    // old version
+    if (Array.isArray(config.data.frames)) {
+      config.data.frames = config.data.frames
+        .reduce((m, f) => (m[res.name+f.filename] = f) && m, {})
+    }
     res.spritesheet = new PIXI.Spritesheet(image.texture.baseTexture, config.data)
     res.spritesheet.parse(next)
   }

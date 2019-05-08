@@ -8,12 +8,13 @@ import path from 'path'
 export default class Spine extends Resource {
   type = RESOURCE_TYPE.SPINE
 
-  constructor({ json, atlas, images }) {
+  constructor({ name, url, json, atlas, images }) {
     super()
     json = json || url
     const ext = path.extname(json)
-    this.name = path.basename(json, ext)
+    this.name = name || path.basename(json, ext)
     this.json = json
+    this.atlas = atlas
     this.images = images
     this.chunk = 4
   }
@@ -31,10 +32,10 @@ export default class Spine extends Resource {
 
     const config = await loader.load(new JSONResource(json)).promise
     this.completeChunk++
-    const atlasPath = atlas || url.replace(/\.json$/, '.atlas')
+    const atlasPath = atlas || json.replace(/\.json$/, '.atlas')
     const atlasRes = await loader.load(new TextResource(atlasPath)).promise
     this.completeChunk++
-    new spine.TextureAtlas(atlasees.source, textureLoader, (spineAtlas) => {
+    new spine.TextureAtlas(atlasRes.source, textureLoader, (spineAtlas) => {
       const attachmentLoader = new spine.AtlasAttachmentLoader(spineAtlas)
       const json = new spine.SkeletonJson(attachmentLoader)
       const skeletonData = json.readSkeletonData(config.data)

@@ -1,5 +1,6 @@
 import { RESOURCE_TYPE, RESOURCE_STATE }  from '../resource.js'
 import { Deferred } from '../util.js'
+import $url from 'url'
 
 const requestByImageElement = (ctx) => {
   const { res } = ctx
@@ -14,13 +15,15 @@ const requestByImageElement = (ctx) => {
 
   if (res.crossOrigin) {
     elem.crossOrigin = res.crossOrigin
+  } else {
+    elem.crossOrigin = determineCrossOrigin(res.url)
   }
 
   const onError = () => {
     clearListener()
     // TODO try again?
     res.emit('error')
-    deferred.resolve()
+    deferred.reject()
   }
   const onComplete = () => {
     res.state = RESOURCE_STATE.LOADED
@@ -61,12 +64,12 @@ const requestByXHR = (ctx) => {
   const onError = (evt) => {
     res.emit('error', evt)
     clearListener()
-    deferred.resolve()
+    deferred.reject()
   }
   const onTimeout = (evt) => {
     res.emit('timeout', evt)
     clearListener()
-    deferred.resolve()
+    deferred.reject()
   }
   const onAbort = (evt) => {
     res.emit('abort', evt)
@@ -118,6 +121,27 @@ const determineResponseType = (res) => {
     default:
       return XHR_RESPONSE_TYPE.BLOB
   }
+}
+
+const determineCrossOrigin = (url) => {
+  // data: and javascript: urls are considered same-origin
+  if (url.indexOf('data:') === 0) {
+      return ''
+  }
+
+  // A sandboxed iframe without the 'allow-same-origin' attribute will have a special
+  // origin designed not to match window.location.origin, and will always require
+  // crossOrigin requests regardless of whether the location matches.
+  if (window.origin !== window.location.origin) {
+      return 'anonymous'
+  }
+
+  const u = $url.parse(url)
+  if (u.host !== window.location.host) {
+      return 'anonymous'
+  }
+
+  return ''
 }
 
 const request = (ctx) => {

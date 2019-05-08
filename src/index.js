@@ -40,7 +40,6 @@ class Loader extends Resource {
 
   _structure(params) {
     if (params instanceof Resource) {
-      this.resources[params.name] = params
       return params
     }
 
@@ -86,8 +85,14 @@ class Loader extends Resource {
     if (this.progressing) {
       throw new Error('add resource when progressing')
     }
-    const res = this._structure(params)
-    if (this._queue.indexOf(res) > -1) return res
+    let res = this._structure(params)
+    res = this.resources[res.name] || res
+    if (res.complete) return res
+
+    this.resources[res.name] = res
+
+    if (this._queue.find(r => r.name === res.name)) return res
+
     res.on('progress', this.emitProgress, this)
     res.on('complete', this.emitProgress, this)
     this._queue.push(res)
@@ -126,7 +131,8 @@ class Loader extends Resource {
   }
 
   load(params) {
-    const res = this._structure(params)
+    let res = this._structure(params)
+    res = this.resources[res.name] || res
     if (res.progressing) return res
     if (res.complete) return res
 
@@ -158,7 +164,7 @@ class Group extends Resource {
 
   add(params) {
     const { loader, _queue } = this
-    const res = loader._structure(params)
+    const res = loader.add(params)
     if (_queue.indexOf(res) > -1) return res
     loader._link(res)
     _queue.push(res)
