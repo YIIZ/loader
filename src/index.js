@@ -1,8 +1,8 @@
 import EventEmitter from 'eventemitter3'
 import compose from 'koa-compose'
 import Resource, { determineResourceType } from './resource.js'
-import { MockResource, TextResource, JSONResource, TextureResource, SpritesheetResource, SpineResource } from './resources'
-export { MockResource, TextResource, JSONResource, TextureResource, SpritesheetResource, SpineResource }
+import { MockResource, TextResource, JSONResource, TextureResource, SpritesheetResource } from './resources'
+export { MockResource, TextResource, JSONResource, TextureResource, SpritesheetResource }
 
 const { RESOURCE_STATE, RESOURCE_TYPE } = Resource
 
@@ -58,9 +58,6 @@ class Loader extends Resource {
         break;
       case RESOURCE_TYPE.SPRITESHEET:
         res = new SpritesheetResource(params)
-        break;
-      case RESOURCE_TYPE.SPINE:
-        res = new SpineResource(params)
         break;
       case RESOURCE_TYPE.MOCK:
         res = new MockResource(params)
@@ -147,6 +144,12 @@ class Loader extends Resource {
     const g = new Group(name, this)
     this.groups[name] = g
     return g
+  }
+
+  find(name) {
+    const r = this.resources[name]
+    if (r) return r
+    return Object.values(this.resources).find(r => r.name === name || r.url === name)
   }
 }
 

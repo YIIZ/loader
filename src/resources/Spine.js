@@ -4,6 +4,12 @@ import Texture from './Texture.js'
 import JSONResource from './JSON.js'
 import TextResource from './Text.js'
 import path from 'path'
+//import { TextureAtlas } from 'pixi-spine/bin/core/TextureAtlas'
+//import { AtlasAttachmentLoader } from 'pixi-spine/bin/core/AtlasAttachmentLoader'
+//import { SkeletonJson } from 'pixi-spine/bin/core/SkeletonJson'
+
+import 'pixi-spine'
+const { TextureAtlas, AtlasAttachmentLoader, SkeletonJson } = PIXI.spine.core
 
 export default class Spine extends Resource {
   type = RESOURCE_TYPE.SPINE
@@ -22,7 +28,6 @@ export default class Spine extends Resource {
   async request(ctx, next) {
     const { loader, res } = ctx
     const { json, atlas, images = {} } = res
-    const spine = PIXI.spine.core
 
     async function textureLoader(path, callback) {
       const img = images[path] || path
@@ -35,9 +40,9 @@ export default class Spine extends Resource {
     const atlasPath = atlas || json.replace(/\.json$/, '.atlas')
     const atlasRes = await loader.load(new TextResource(atlasPath)).promise
     this.completeChunk++
-    new spine.TextureAtlas(atlasRes.source, textureLoader, (spineAtlas) => {
-      const attachmentLoader = new spine.AtlasAttachmentLoader(spineAtlas)
-      const json = new spine.SkeletonJson(attachmentLoader)
+    new TextureAtlas(atlasRes.source, textureLoader, (spineAtlas) => {
+      const attachmentLoader = new AtlasAttachmentLoader(spineAtlas)
+      const json = new SkeletonJson(attachmentLoader)
       const skeletonData = json.readSkeletonData(config.data)
       res.spineData = skeletonData
       res.spineAtlas = spineAtlas

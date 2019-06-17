@@ -1,18 +1,19 @@
+import { Spritesheet } from 'pixi.js'
 import Resource, { RESOURCE_TYPE } from '../resource.js'
 import { request } from '../requesters'
 import Texture from './Texture.js'
 import JSONResource from './JSON.js'
 import path from 'path'
 
-export default class Spritesheet extends Resource {
+export default class SpritesheetRes extends Resource {
   type = RESOURCE_TYPE.SPRITESHEET
 
-  constructor({ url, json, image }) {
+  constructor({ name, url, json, image }) {
     super()
     this.chunk = 3
     json = json || url
     const ext = path.extname(json)
-    this.name = path.basename(json, ext)
+    this.name = name || path.basename(json, ext)
     this.json = json
     this.image = image
   }
@@ -29,7 +30,7 @@ export default class Spritesheet extends Resource {
       config.data.frames = config.data.frames
         .reduce((m, f) => (m[res.name+f.filename] = f) && m, {})
     }
-    res.spritesheet = new PIXI.Spritesheet(image.texture.baseTexture, config.data)
+    res.spritesheet = new Spritesheet(image.texture.baseTexture, config.data)
     res.spritesheet.parse(next)
   }
 }
