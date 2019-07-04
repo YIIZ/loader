@@ -1,7 +1,7 @@
 {
   "name": "@teambun/loader",
-  "version": "0.1.2",
-  "main": "lib/index.js",
+  "version": "0.3.0",
+  "main": "src/index.js",
   "author": "relaxgo <patientzhe@gmail.com>",
   "license": "MIT",
   "scripts": {
