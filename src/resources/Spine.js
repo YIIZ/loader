@@ -8,8 +8,9 @@ import path from 'path'
 //import { AtlasAttachmentLoader } from 'pixi-spine/bin/core/AtlasAttachmentLoader'
 //import { SkeletonJson } from 'pixi-spine/bin/core/SkeletonJson'
 
-import 'pixi-spine'
-const { TextureAtlas, AtlasAttachmentLoader, SkeletonJson } = PIXI.spine.core
+import spine from 'pixi-spine.es'
+// FIXME now need expose spine
+const { TextureAtlas, AtlasAttachmentLoader, SkeletonJson } = spine.core
 
 export default class Spine extends Resource {
   type = RESOURCE_TYPE.SPINE
