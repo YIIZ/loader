@@ -18,23 +18,23 @@ class Loader extends Resource {
     this._links = {}
   }
 
-  beforeRequest(...fn) {
+  beforeFetch(...fn) {
     if (this.progressing) {
       throw new Error('add middleware when progressing')
     }
     this._before.push(...fn)
-    this.handle = compose([...this._before, this.request, ...this._after])
+    this.handle = compose([...this._before, this.fetch, ...this._after])
   }
 
-  afterRequest(...fn) {
+  afterFetch(...fn) {
     if (this.progressing) {
       throw new Error('add middleware when progressing')
     }
     this._after.unshift(...fn)
-    this.handle = compose([...this._before, this.request, ...this._after])
+    this.handle = compose([...this._before, this.fetch, ...this._after])
   }
 
-  request(ctx, next) {
+  fetch(ctx, next) {
     return ctx.res.request(ctx, next)
   }
 
@@ -93,6 +93,7 @@ class Loader extends Resource {
     res.on('progress', this.emitProgress, this)
     res.on('complete', this.emitProgress, this)
     this._queue.push(res)
+    this.chunk = this._queue.reduce((s, v) => s + v.chunk, 0)
     return res
   }
 
@@ -125,6 +126,10 @@ class Loader extends Resource {
       this.resolve()
       this._queue.length = 0
     })
+  }
+
+  request() {
+    return this.run()
   }
 
   load(params) {
@@ -167,10 +172,24 @@ class Group extends Resource {
 
   add(params) {
     const { loader, _queue } = this
-    const res = loader.add(params)
+
+    if (this.progressing) {
+      throw new Error('add resource when progressing')
+    }
+
+    let res = loader._structure(params)
+    res = loader.resources[res.name] || res
+    if (res.complete) return res
+
+    loader.resources[res.name] = res
+
+    if (this._queue.find(r => r.name === res.name)) return res
     if (_queue.indexOf(res) > -1) return res
+
     loader._link(res)
     _queue.push(res)
+
+    this.chunk = this._queue.reduce((s, v) => s + v.chunk, 0)
     return res
   }
 
@@ -181,6 +200,10 @@ class Group extends Resource {
       this.resolve()
       this._queue.length = 0
     })
+  }
+
+  request() {
+    return this.run()
   }
 
   unique() {
