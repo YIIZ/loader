@@ -6,7 +6,7 @@ export { MockResource, TextResource, JSONResource, TextureResource, SpritesheetR
 
 const { RESOURCE_STATE, RESOURCE_TYPE } = Resource
 
-class Loader extends Resource {
+export class Loader extends Resource {
   constructor() {
     super({ type: 'LOADER' })
     this.groups = {}
@@ -123,8 +123,8 @@ class Loader extends Resource {
     const { resources, _queue } = this
     Promise.all(_queue.map(res => loader.load(res).promise))
     .then(() => {
-      this.resolve()
       this._queue.length = 0
+      this.resolve()
     })
   }
 
@@ -197,8 +197,8 @@ class Group extends Resource {
     const { _queue, loader } = this
     Promise.all(_queue.map(res => loader.load(res).promise))
     .then(() => {
-      this.resolve()
       this._queue.length = 0
+      this.resolve()
     })
   }
 
@@ -226,6 +226,3 @@ class Group extends Resource {
 const loader = new Loader()
 
 export default loader
-export {
-  Loader
-}
