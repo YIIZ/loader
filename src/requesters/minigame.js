@@ -1,9 +1,9 @@
-import { RESOURCE_TYPE, RESOURCE_STATE }  from '../resource.js'
+import { RESOURCE_TYPE, RESOURCE_STATE } from '../resource.js'
 import { Deferred } from '../util.js'
 
 // TODO 缓存本地？
 
-const requestByImageElement = (ctx) => {
+const requestByImageElement = ctx => {
   const { res } = ctx
   const elem = new Image()
   const deferred = new Deferred()
@@ -28,21 +28,20 @@ const requestByImageElement = (ctx) => {
   return deferred.promise
 }
 
-const requestByRequest = (ctx) => {
+const requestByRequest = ctx => {
   const { res, loader } = ctx
   const deferred = new Deferred()
 
   const { url } = res
   const responseType = determineResponseType(res)
 
-
-  const onError = (evt) => {
+  const onError = evt => {
     res.state = RESOURCE_STATE.ERROR
     res.emit('error', evt)
     res.reject()
   }
 
-  const onLoad = (evt) => {
+  const onLoad = evt => {
     if (evt.statusCode !== 200) return onError(evt)
 
     res.state = RESOURCE_STATE.LOADED
@@ -61,20 +60,20 @@ const requestByRequest = (ctx) => {
   return deferred.promise
 }
 
-const requestByDownload = (ctx) => {
+const requestByDownload = ctx => {
   const { res, loader } = ctx
   const deferred = new Deferred()
 
   const { url } = res
 
-  const onError = (evt) => {
+  const onError = evt => {
     console.error('requestByDownload', evt)
     res.state = RESOURCE_STATE.ERROR
     res.emit('error', evt)
     res.reject()
   }
 
-  const onLoad = (evt) => {
+  const onLoad = evt => {
     if (evt.statusCode !== 200) return onError(evt)
 
     res.state = RESOURCE_STATE.LOADED
@@ -97,7 +96,7 @@ const RESPONSE_TYPE = {
   TEXT: 'text',
 }
 
-const determineResponseType = (res) => {
+const determineResponseType = res => {
   switch (res.type) {
     case RESOURCE_TYPE.TEXT:
     case RESOURCE_TYPE.JSON:
@@ -107,7 +106,7 @@ const determineResponseType = (res) => {
   }
 }
 
-const request = (ctx) => {
+const request = ctx => {
   const { res } = ctx
   switch (res.type) {
     case RESOURCE_TYPE.JSON:

@@ -1,8 +1,8 @@
-import { RESOURCE_TYPE, RESOURCE_STATE }  from '../resource.js'
+import { RESOURCE_TYPE, RESOURCE_STATE } from '../resource.js'
 import { Deferred } from '../util.js'
 import $url from 'url'
 
-const requestByImageElement = (ctx) => {
+const requestByImageElement = ctx => {
   const { res } = ctx
   const deferred = new Deferred()
   let elem
@@ -50,7 +50,7 @@ const requestByImageElement = (ctx) => {
   return deferred.promise
 }
 
-const requestByXHR = (ctx) => {
+const requestByXHR = ctx => {
   const { res, timeout } = ctx
   const deferred = new Deferred()
 
@@ -61,26 +61,26 @@ const requestByXHR = (ctx) => {
 
   xhr.responseType = determineResponseType(res)
 
-  const onError = (evt) => {
+  const onError = evt => {
     res.emit('error', evt)
     clearListener()
     deferred.reject()
   }
-  const onTimeout = (evt) => {
+  const onTimeout = evt => {
     res.emit('timeout', evt)
     clearListener()
     deferred.reject()
   }
-  const onAbort = (evt) => {
+  const onAbort = evt => {
     res.emit('abort', evt)
     clearListener()
     deferred.resolve()
   }
-  const onProgress = (evt) => {
+  const onProgress = evt => {
     res.emit('update', evt)
     res.emit('progress')
   }
-  const onLoad = (evt) => {
+  const onLoad = evt => {
     res.state = RESOURCE_STATE.LOADED
     res.source = xhr.response
     clearListener()
@@ -113,7 +113,7 @@ const XHR_RESPONSE_TYPE = {
   TEXT: 'text',
 }
 
-const determineResponseType = (res) => {
+const determineResponseType = res => {
   switch (res.type) {
     case RESOURCE_TYPE.TEXT:
     case RESOURCE_TYPE.JSON:
@@ -123,28 +123,28 @@ const determineResponseType = (res) => {
   }
 }
 
-const determineCrossOrigin = (url) => {
+const determineCrossOrigin = url => {
   // data: and javascript: urls are considered same-origin
   if (url.indexOf('data:') === 0) {
-      return ''
+    return ''
   }
 
   // A sandboxed iframe without the 'allow-same-origin' attribute will have a special
   // origin designed not to match window.location.origin, and will always require
   // crossOrigin requests regardless of whether the location matches.
   if (window.origin !== window.location.origin) {
-      return 'anonymous'
+    return 'anonymous'
   }
 
   const u = $url.parse(url)
   if (u.host !== window.location.host) {
-      return 'anonymous'
+    return 'anonymous'
   }
 
   return ''
 }
 
-const request = (ctx) => {
+const request = ctx => {
   const { res } = ctx
   switch (res.type) {
     case RESOURCE_TYPE.JSON:

@@ -12,8 +12,8 @@ export class Loader extends Resource {
     this.groups = {}
     this.resources = {}
     this.timeout = 3000
-    this._before =[]
-    this._after =[]
+    this._before = []
+    this._after = []
     this._queue = []
     this._links = {}
   }
@@ -49,21 +49,21 @@ export class Loader extends Resource {
     switch (type) {
       case RESOURCE_TYPE.JSON:
         res = new JSONResource(params)
-        break;
+        break
       case RESOURCE_TYPE.TEXT:
         res = new JSONResource(params)
-        break;
+        break
       case RESOURCE_TYPE.IMAGE:
         res = new TextureResource(params)
-        break;
+        break
       case RESOURCE_TYPE.SPRITESHEET:
         res = new SpritesheetResource(params)
-        break;
+        break
       case RESOURCE_TYPE.MOCK:
         res = new MockResource(params)
-        break;
+        break
       default:
-        throw new Error("unknown resource")
+        throw new Error('unknown resource')
     }
 
     return res
@@ -100,8 +100,8 @@ export class Loader extends Resource {
   emitProgress() {
     const all = this._queue.reduce((s, v) => s + v.chunk, 0)
     const complete = this._queue.reduce((s, v) => s + v.completeChunk, 0)
-    this.emit('update', { progress: complete / all * 100 })
-    this.emit('progress', { progress: complete / all * 100 })
+    this.emit('update', { progress: (complete / all) * 100 })
+    this.emit('progress', { progress: (complete / all) * 100 })
   }
 
   remove(params) {
@@ -121,8 +121,7 @@ export class Loader extends Resource {
 
   run() {
     const { resources, _queue } = this
-    Promise.all(_queue.map(res => loader.load(res).promise))
-    .then(() => {
+    Promise.all(_queue.map(res => loader.load(res).promise)).then(() => {
       this._queue.length = 0
       this.resolve()
     })
@@ -195,8 +194,7 @@ class Group extends Resource {
 
   run() {
     const { _queue, loader } = this
-    Promise.all(_queue.map(res => loader.load(res).promise))
-    .then(() => {
+    Promise.all(_queue.map(res => loader.load(res).promise)).then(() => {
       this._queue.length = 0
       this.resolve()
     })
@@ -208,12 +206,12 @@ class Group extends Resource {
 
   unique() {
     const { loader, _queue } = this
-    return _queue.filter((res) => loader._links[res.name] === 1)
+    return _queue.filter(res => loader._links[res.name] === 1)
   }
 
   destory() {
     const { loader, _queue } = this
-    _queue.forEach((res) => {
+    _queue.forEach(res => {
       loader._unlink(res)
       if (loader._links[res] > 0) return
       loader.remove(res)

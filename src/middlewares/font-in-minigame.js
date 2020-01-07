@@ -1,17 +1,17 @@
-import { RESOURCE_TYPE, RESOURCE_STATE }  from '../resource.js'
+import { RESOURCE_TYPE, RESOURCE_STATE } from '../resource.js'
 
 const fontLoader = (ctx, next) => {
   const { res } = ctx
-  if (res.type  !== RESOURCE_TYPE.FONT) return next()
+  if (res.type !== RESOURCE_TYPE.FONT) return next()
 
-  const success = (evt) => {
+  const success = evt => {
     const { savedFilePath } = evt
     res.source = savedFilePath
     res.fontFamily = wx.loadFont(savedFilePath)
     next()
   }
 
-  const fail = (evt) => {
+  const fail = evt => {
     res.state = RESOURCE_STATE.ERROR
     res.emit('error', evt)
     res.reject()

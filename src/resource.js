@@ -38,7 +38,7 @@ class Resource extends EventEmitter {
         this.emit('complete', this)
         resolve(this)
       }
-      this.reject = (err) => {
+      this.reject = err => {
         this.state = RESOURCE_STATE.ERROR
         this.emit('reject', this)
         reject(this)
@@ -69,10 +69,6 @@ Resource.determineResourceType = determineResourceType
 Resource.RESOURCE_STATE = RESOURCE_STATE
 Resource.RESOURCE_TYPE = RESOURCE_TYPE
 
-export {
-  RESOURCE_STATE,
-  RESOURCE_TYPE,
-  determineResourceType,
-}
+export { RESOURCE_STATE, RESOURCE_TYPE, determineResourceType }
 
 export default Resource

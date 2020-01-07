@@ -41,7 +41,7 @@ export default class Spine extends Resource {
     const atlasPath = atlas || json.replace(/\.json$/, '.atlas')
     const atlasRes = await loader.load(new TextResource(atlasPath)).promise
     this.completeChunk++
-    new TextureAtlas(atlasRes.source, textureLoader, (spineAtlas) => {
+    new TextureAtlas(atlasRes.source, textureLoader, spineAtlas => {
       const attachmentLoader = new AtlasAttachmentLoader(spineAtlas)
       const json = new SkeletonJson(attachmentLoader)
       const skeletonData = json.readSkeletonData(config.data)
@@ -51,4 +51,3 @@ export default class Spine extends Resource {
     })
   }
 }
-

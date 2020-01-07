@@ -27,8 +27,7 @@ export default class SpritesheetRes extends Resource {
     this.completeChunk += 1
     // old version
     if (Array.isArray(config.data.frames)) {
-      config.data.frames = config.data.frames
-        .reduce((m, f) => (m[res.name+f.filename] = f) && m, {})
+      config.data.frames = config.data.frames.reduce((m, f) => (m[res.name + f.filename] = f) && m, {})
     }
     res.spritesheet = new Spritesheet(image.texture.baseTexture, config.data)
     res.spritesheet.parse(next)

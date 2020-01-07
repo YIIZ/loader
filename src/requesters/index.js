@@ -4,6 +4,6 @@ import minigameRequest from './minigame.js'
 export { webRequest, minigameRequest }
 
 export let request = webRequest
-export const setRequest = (req) => {
+export const setRequest = req => {
   request = req
 }
