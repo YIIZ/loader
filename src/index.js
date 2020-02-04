@@ -23,7 +23,7 @@ export class Loader extends Resource {
       throw new Error('add middleware when progressing')
     }
     this._before.push(...fn)
-    this.handle = compose([...this._before, this.fetch, ...this._after])
+    this.handle = compose([...this._before, this._fetch, ...this._after])
   }
 
   afterFetch(...fn) {
@@ -31,10 +31,10 @@ export class Loader extends Resource {
       throw new Error('add middleware when progressing')
     }
     this._after.unshift(...fn)
-    this.handle = compose([...this._before, this.fetch, ...this._after])
+    this.handle = compose([...this._before, this._fetch, ...this._after])
   }
 
-  fetch(ctx, next) {
+  _fetch(ctx, next) {
     return ctx.res.request(ctx, next)
   }
 
