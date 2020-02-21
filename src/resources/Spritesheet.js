@@ -20,10 +20,12 @@ export default class SpritesheetRes extends Resource {
 
   async request(ctx, next) {
     const { loader, res } = ctx
-    const config = await loader.load(new JSONResource(res.json)).promise
+    this.jsonRes = loader.load(new JSONResource(res.json))
+    const config = await this.jsonRes.promise
     this.completeChunk += 1
     const imgPath = res.image || config.data.meta.image
-    const image = await loader.load(new Texture(imgPath)).promise
+    this.imageRes = loader.load(new Texture(imgPath))
+    const image = await this.imageRes.promise
     this.completeChunk += 1
     // old version
     if (Array.isArray(config.data.frames)) {
