@@ -36,8 +36,6 @@ const requestByRequest = ctx => {
   const responseType = determineResponseType(res)
 
   const onError = evt => {
-    res.state = RESOURCE_STATE.ERROR
-    res.emit('error', evt)
     res.reject()
   }
 
@@ -68,8 +66,6 @@ const requestByDownload = ctx => {
 
   const onError = evt => {
     console.error('requestByDownload', evt)
-    res.state = RESOURCE_STATE.ERROR
-    res.emit('error', evt)
     res.reject()
   }
 

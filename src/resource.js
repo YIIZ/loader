@@ -7,6 +7,7 @@ const RESOURCE_TYPE = {
   SPRITESHEET: 'SPRITESHEET',
   SPINE: 'SPINE',
   FONT: 'FONT',
+  AUDIO: 'AUDIO',
   MOCK: 'MOCK',
   UNKNOWN: 'UNKNOWN',
 }
@@ -40,8 +41,8 @@ class Resource extends EventEmitter {
       }
       this.reject = err => {
         this.state = RESOURCE_STATE.ERROR
-        this.emit('reject', this)
-        reject(this)
+        this.emit('error', err)
+        reject(err)
       }
     })
   }
