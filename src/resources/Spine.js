@@ -8,7 +8,8 @@ import path from 'path'
 //import { AtlasAttachmentLoader } from 'pixi-spine/bin/core/AtlasAttachmentLoader'
 //import { SkeletonJson } from 'pixi-spine/bin/core/SkeletonJson'
 
-import spine from 'pixi-spine.es'
+import { spine } from 'pixi.js'
+//const spine = require('pixi-spine')
 // FIXME now need expose spine
 const { TextureAtlas, AtlasAttachmentLoader, SkeletonJson } = spine.core
 
