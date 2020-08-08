@@ -9,7 +9,6 @@ export default class TextureRes extends Resource {
     const { res } = ctx
     await request(ctx)
     res.texture = Texture.fromLoader(res.source, res.url, res.name)
-    next()
-    return
+    return next()
   }
 }

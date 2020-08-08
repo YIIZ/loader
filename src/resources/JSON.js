@@ -8,7 +8,6 @@ export default class JSONResource extends Resource {
     const { res } = ctx
     await request(ctx)
     res.data = JSON.parse(res.source)
-    next()
-    return
+    return next()
   }
 }

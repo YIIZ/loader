@@ -7,7 +7,6 @@ export default class TextResource extends Resource {
   async request(ctx, next) {
     const { res } = ctx
     await request(ctx)
-    next()
-    return
+    return next()
   }
 }

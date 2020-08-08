@@ -1,4 +1,4 @@
-const resolvePromise = (ctx, next) => {
+const resolvePromise = (ctx) => {
   const { loader, res } = ctx
   res.resolve()
 }

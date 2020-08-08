@@ -32,6 +32,7 @@ export default class SpritesheetRes extends Resource {
       config.data.frames = config.data.frames.reduce((m, f) => (m[res.name + f.filename] = f) && m, {})
     }
     res.spritesheet = new Spritesheet(image.texture.baseTexture, config.data)
-    res.spritesheet.parse(next)
+    await new Promise((r) => res.spritesheet.parse(r))
+    return next()
   }
 }
