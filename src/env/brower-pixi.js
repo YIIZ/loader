@@ -1,4 +1,5 @@
 import loader from '../index'
-import resolvePromise from '../middlewares/resolve-promise.js'
+import { resolvePromise, resourceRequest } from '../middlewares'
 
+loader.use(resourceRequest)
 loader.use(resolvePromise)

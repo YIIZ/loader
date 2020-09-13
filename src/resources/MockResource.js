@@ -14,19 +14,19 @@ export default class MockResource extends Resource {
     this.startAt = Date.now()
 
     await new Promise((resolve) => {
+      this.loopResolve = resolve
       this.loop()
-      this.complete = resolve
     })
 
     return next()
   }
 
   loop = () => {
-    const { chunk, completeChunk, duration, startAt, msRate, complete } = this
+    const { chunk, completeChunk, duration, startAt, msRate } = this
     const now = Date.now()
     const elapse = now - startAt
     if (elapse > duration) {
-      return complete()
+      return this.loopResolve()
     }
     this.completeChunk = Math.floor(elapse * msRate)
     this.emit('progress', this)
