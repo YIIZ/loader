@@ -3,7 +3,7 @@ import Resource, { RESOURCE_TYPE } from '../resource.js'
 import { request } from '../requesters'
 import Texture from './Texture.js'
 import JSONResource from './JSON.js'
-import path from 'path'
+import path from 'path-browserify'
 
 export default class SpritesheetRes extends Resource {
   type = RESOURCE_TYPE.SPRITESHEET
@@ -34,5 +34,16 @@ export default class SpritesheetRes extends Resource {
     res.spritesheet = new Spritesheet(image.texture.baseTexture, config.data)
     await new Promise((r) => res.spritesheet.parse(r))
     return next()
+  }
+
+  subres = (name) => {
+    const res = this
+    return {
+      name,
+      res,
+      get texture() {
+        return res.spritesheet?.textures?.[name]
+      },
+    }
   }
 }

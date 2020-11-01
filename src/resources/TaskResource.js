@@ -11,7 +11,7 @@ export default class TaskResource extends Resource {
   }
 
   async request(ctx, next) {
-    await this.task()
+    await this.task(ctx)
     return next()
   }
 }

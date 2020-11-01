@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "eventemitter3": "latest",
-    "koa-compose": "latest"
+    "koa-compose": "latest",
+    "path-browserify": "latest"
   },
   "devDependencies": {
     "@babel/cli": "latest",
