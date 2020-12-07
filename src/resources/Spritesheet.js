@@ -46,4 +46,8 @@ export default class SpritesheetRes extends Resource {
       },
     }
   }
+
+  texture = (name) => {
+    return this.spritesheet?.textures?.[name]
+  }
 }

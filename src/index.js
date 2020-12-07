@@ -72,8 +72,6 @@ export class Loader extends Resource {
     }
     let res = this._structure(params)
     res = this.resources[res.name] || res
-    if (res.complete) return res
-
     this.resources[res.name] = res
 
     if (this._queue.find((r) => r.name === res.name)) return res
@@ -169,12 +167,9 @@ class Group extends Resource {
 
     let res = loader._structure(params)
     res = loader.resources[res.name] || res
-    if (res.complete) return res
-
     loader.resources[res.name] = res
 
-    if (this._queue.find((r) => r.name === res.name)) return res
-    if (_queue.indexOf(res) > -1) return res
+    if (_queue.find((r) => r.name === res.name)) return res
 
     loader._link(res)
     _queue.push(res)
