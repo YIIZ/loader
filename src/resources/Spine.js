@@ -37,10 +37,12 @@ export default class Spine extends Resource {
       callback(item.texture.baseTexture)
     }
 
-    const config = await loader.load(new JSONResource(json)).promise
-    this.completeChunk++
     const atlasPath = atlas || json.replace(/\.json$/, '.atlas')
-    const atlasRes = await loader.load(new TextResource(atlasPath)).promise
+    const [config, atlasRes] = await Promise.all([
+      loader.load(new JSONResource(json)).promise,
+      loader.load(new TextResource(atlasPath)).promise,
+    ])
+    this.completeChunk++
     this.completeChunk++
 
     await new Promise((resolve) => {
