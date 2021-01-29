@@ -23,10 +23,12 @@ export default class SpritesheetRes extends Resource {
     this.jsonRes = loader.load(new JSONResource(res.json))
     const config = await this.jsonRes.promise
     this.completeChunk += 1
+    res.emit('progress')
     const imgPath = res.image || config.data.meta.image
     this.imageRes = loader.load(new Texture(imgPath))
     const image = await this.imageRes.promise
     this.completeChunk += 1
+    res.emit('progress')
     // old version
     if (Array.isArray(config.data.frames)) {
       config.data.frames = config.data.frames.reduce((m, f) => (m[res.name + f.filename] = f) && m, {})

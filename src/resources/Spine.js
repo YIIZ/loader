@@ -31,21 +31,23 @@ export default class Spine extends Resource {
     const { loader, res } = ctx
     const { json, atlas, images = {} } = res
 
-    async function textureLoader(path, callback) {
-      const img = images[path] || path
-      const item = await loader.load(new Texture(img)).promise
-      callback(item.texture.baseTexture)
-    }
-
     const atlasPath = atlas || json.replace(/\.json$/, '.atlas')
     const [config, atlasRes] = await Promise.all([
       loader.load(new JSONResource(json)).promise,
       loader.load(new TextResource(atlasPath)).promise,
     ])
     this.completeChunk++
-    this.completeChunk++
+    res.emit('progress')
 
     await new Promise((resolve) => {
+      const textureLoader = async (path, callback) => {
+        const img = images[path] || path
+        const item = await loader.load(new Texture(img)).promise
+        callback(item.texture.baseTexture)
+        this.completeChunk = Math.min(this.chunk - 1, this.completeChunk + 1)
+        res.emit('progress')
+      }
+
       new TextureAtlas(atlasRes.source, textureLoader, (spineAtlas) => {
         const attachmentLoader = new AtlasAttachmentLoader(spineAtlas)
         const json = new SkeletonJson(attachmentLoader)

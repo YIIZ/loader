@@ -84,10 +84,23 @@ export class Loader extends Resource {
   }
 
   emitProgress() {
-    const all = this._queue.reduce((s, v) => s + v.chunk, 0)
-    const complete = this._queue.reduce((s, v) => s + v.completeChunk, 0)
-    this.emit('update', { progress: (complete / all) * 100 })
-    this.emit('progress', { progress: (complete / all) * 100 })
+    const p = this.getProgress()
+    this.emit('update', p)
+    this.emit('progress', p)
+  }
+
+  getProgress() {
+    const { _queue } = this
+    let chunk = 0
+    let completeChunk = 0
+    let s = null
+    for (var i = 0, len = _queue.length; i < len; i++) {
+      s = _queue[i]
+      chunk += s.chunk
+      completeChunk += s.completeChunk
+    }
+    const progress = (completeChunk / chunk) * 100
+    return { progress, chunk, completeChunk }
   }
 
   remove(params) {
